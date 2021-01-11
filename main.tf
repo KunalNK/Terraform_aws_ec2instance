@@ -1,6 +1,18 @@
+# Define variables
+variable "aws_access_key" {}
+
+variable "aws_secret_key" {}
+
+variable "region" {}
+  
+
+# //////////////////////////////
 # Configure the AWS Provider
+# //////////////////////////////
 provider "aws" {
-  region = "us-east-1"
+  access_key = var.aws_access_key
+  secret_key = var.aws_secret_key
+  region     = var.region
 }
 
 # 1. Create vpc
@@ -135,28 +147,11 @@ resource "aws_instance" "web-server-instance" {
   instance_type     = "t2.micro"
   availability_zone = "us-east-1a"
   key_name          = "ansible"
-  
+
   network_interface {
     device_index         = 0
     network_interface_id = aws_network_interface.web-server-nic.id
   }
-
-# resource "aws_instance" "web-server-instance" {
-#   provisioner "remote-exec" {
-#     inline = [
-#     "sudo yum install wget -y",
-#     "sudo wget -O /etc/yum.repos.d/jenkins.repo \
-#     https://pkg.jenkins.io/redhat/jenkins.repo -y",
-#     "sudo rpm --import https://pkg.jenkins.io/redhat/jenkins.io.key",
-#     "sudo yum upgrade -y",
-#     "sudo yum install jenkins java-1.8.0-openjdk-devel -y",
-#     "sudo systemctl daemon-reload",
-#     "sudo systemctl start jenkins",
-#     "sudo systemctl status jenkins",
-#     "sudo cat /var/lib/jenkins/secrets/initialAdminPassword",
-#     ]
-#   }
-# }
 
 user_data= <<-EOF
           #!/bin/bash
@@ -165,7 +160,7 @@ user_data= <<-EOF
           sudo systemctl start httpd
           sudo systemctl enable httpd
           echo "<h1> Welcome to DevOps World & Terraform</h1>" >> /var/www/html/index.html
-          git clone https://github.com/KunalNK/jenkins.git
+          
                     
 EOF
   
